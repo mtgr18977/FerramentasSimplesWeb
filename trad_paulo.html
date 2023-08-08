@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tradutor de Texto PT-EN</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      margin-bottom: 10px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: none;
+    }
+
+    button {
+      display: block;
+      margin: 0 auto;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #outputTextarea {
+      background-color: #f4f4f4;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tradutor de Texto PT-EN</h1>
+    <textarea id="inputTextarea" placeholder="Cole o texto em português aqui"></textarea>
+    <button id="translateBtn">Traduzir</button>
+    <textarea id="outputTextarea" placeholder="Texto traduzido em inglês aparecerá aqui" readonly></textarea>
+  </div>
+
+  <script>
+    document.getElementById('translateBtn').addEventListener('click', () => {
+      const inputText = document.getElementById('inputTextarea').value;
+
+      if (!inputText) {
+        alert('Por favor, insira um texto em português para traduzir.');
+        return;
+      }
+
+      const googleTranslateUrl = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=pt&tl=en&dt=t&q=';
+
+      fetch(googleTranslateUrl + encodeURIComponent(inputText))
+        .then(response => response.json())
+        .then(data => {
+          const translatedText = data[0][0][0];
+          document.getElementById('outputTextarea').value = translatedText;
+        })
+        .catch(error => {
+          console.error('Erro na tradução:', error);
+        });
+    });
+  </script>
+</body>
+</html>

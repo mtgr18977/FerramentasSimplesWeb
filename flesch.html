@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebApp Índice de Legibilidade Flesch</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    textarea {
+      width: 100%;
+      height: 200px;
+      margin-bottom: 10px;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: none;
+    }
+
+    button {
+      display: block;
+      margin: 0 auto;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    td {
+      font-weight: bold;
+    }
+
+    #numPalavras, #numFrases, #numSilabas, #fleschIndex {
+      color: #4CAF50;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>WebApp Índice de Legibilidade Flesch</h1>
+    <textarea id="inputTextarea" placeholder="Cole o texto aqui"></textarea>
+    <button id="calculateBtn">Calcular</button>
+    <table>
+      <tr>
+        <th>Número de Palavras</th>
+        <th>Número de Frases</th>
+        <th>Número de Sílabas</th>
+        <th>Índice de Legibilidade Flesch</th>
+      </tr>
+      <tr>
+        <td id="numPalavras"></td>
+        <td id="numFrases"></td>
+        <td id="numSilabas"></td>
+        <td id="fleschIndex"></td>
+      </tr>
+    </table>
+  </div>
+<script>
+    // Função para calcular o Índice de Legibilidade Flesch
+    function calcularFlesch(texto) {
+      // Remover pontuações e quebras de linha para contar corretamente as palavras e frases
+      const cleanText = texto.replace(/[\.,?!;:'"()\n]/g, '');
+
+      // Contar o número de palavras
+      const palavras = cleanText.trim().split(/\s+/).length;
+
+      // Contar o número de frases
+      const frases = cleanText.split(/[.!?]/g).filter(Boolean).length;
+
+      // Contar o número de sílabas (uma aproximação simples)
+      const silabas = cleanText.split(/[aeiouyáàâãéèêíìîóòôõúùû]/i).length - 1;
+
+      // Calcular o Índice de Legibilidade Flesch
+      const flesch = 206.835 - 1.015 * (palavras / frases) - 84.6 * (silabas / palavras);
+
+      return { palavras, frases, silabas, flesch }; // Retornar um objeto com os valores calculados
+    }
+
+    // Evento ao clicar no botão "Calcular"
+    document.getElementById('calculateBtn').addEventListener('click', () => {
+      const inputText = document.getElementById('inputTextarea').value;
+      const { palavras, frases, silabas, flesch } = calcularFlesch(inputText);
+
+      document.getElementById('numPalavras').textContent = palavras;
+      document.getElementById('numFrases').textContent = frases;
+      document.getElementById('numSilabas').textContent = silabas;
+      document.getElementById('fleschIndex').textContent = isNaN(flesch) ? 'N/A' : flesch.toFixed(2);
+
+      // Exibir o resultado na página HTML
+      const resultadoElement = document.getElementById('resultado');
+      resultadoElement.textContent = isNaN(flesch) ? 'N/A' : `O Índice de Legibilidade Flesch é: ${flesch.toFixed(2)}`;
+    });
+  </script>
+</body>
+</html>

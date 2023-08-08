@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+button {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    margin-bottom: 5px;
+}
+
+.delete {
+    cursor: pointer;
+    color: #e74c3c;
+}
+
+.total-cost {
+    margin-top: 10px;
+    text-align: right;
+    font-weight: bold;
+}
+</style>
+<title>Assinaturas</title>
+</head>
+<body>
+    <h1>Gerenciador de Assinaturas</h1>
+    <button id="addSubscription">Cadastrar Assinatura</button>
+    <div id="subscriptionList"></div>
+
+    <script>
+	document.addEventListener('DOMContentLoaded', function () {
+    const subscriptionList = document.getElementById('subscriptionList');
+    const addSubscriptionButton = document.getElementById('addSubscription');
+
+    const subscriptions = JSON.parse(localStorage.getItem('subscriptions')) || [];
+
+    function saveSubscriptions() {
+        localStorage.setItem('subscriptions', JSON.stringify(subscriptions));
+    }
+
+    function updateList() {
+        subscriptionList.innerHTML = '';
+
+        let totalMonthlyCost = 0;
+
+        subscriptions.forEach((subscription, index) => {
+            const subscriptionItem = document.createElement('li');
+            subscriptionItem.innerHTML = `
+                <span>${subscription.name} - R$ ${subscription.monthlyCost.toFixed(2)}</span>
+                <span class="delete" data-index="${index}">Excluir</span>
+            `;
+
+            subscriptionList.appendChild(subscriptionItem);
+
+            totalMonthlyCost += subscription.monthlyCost;
+        });
+
+        const totalCostElement = document.createElement('p');
+        totalCostElement.innerHTML = `<strong>Total Mensal: R$ ${totalMonthlyCost.toFixed(2)}</strong>`;
+        subscriptionList.appendChild(totalCostElement);
+
+        const deleteButtons = document.querySelectorAll('.delete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const index = parseInt(this.getAttribute('data-index'));
+                subscriptions.splice(index, 1);
+                saveSubscriptions();
+                updateList();
+            });
+        });
+    }
+
+    addSubscriptionButton.addEventListener('click', function () {
+        const name = prompt('Digite o nome da assinatura:');
+        const monthlyCost = parseFloat(prompt('Digite o valor mensal da assinatura (ex: 9.99):'));
+
+        if (name && monthlyCost) {
+            subscriptions.push({
+                name: name,
+                monthlyCost: monthlyCost
+            });
+
+            saveSubscriptions();
+            updateList();
+        }
+    });
+
+    updateList();
+});
+
+	</script>
+</body>
+</html>

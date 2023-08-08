@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Notas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+  
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+  
+    textarea {
+      width: 100%;
+      height: 100px;
+      margin-bottom: 10px;
+    }
+  
+    .note-list {
+      list-style-type: none;
+      padding: 0;
+    }
+  
+	.note-list li {
+		margin-bottom: 5px;
+		border-bottom: 1px dotted #ccc; /* Adicionado: linha pontilhada */
+		padding-bottom: 5px; /* Adicionado: espaçamento na parte inferior */
+	}
+  
+    .save-btn {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .clear-btn {
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Notas</h1>
+
+    <textarea id="noteInput" placeholder="Digite sua nota"></textarea>
+
+    <button class="save-btn" onclick="saveNote()">Salvar</button>
+    <button class="clear-btn save-btn" onclick="clearNotes()">Limpar Notas</button> <!-- Modificado: adicionei a classe "save-btn" para estilizar igual ao botão de salvar -->
+
+    <ul class="note-list" id="noteList">
+      <!-- As notas antigas serão adicionadas aqui dinamicamente -->
+    </ul>
+  </div>
+
+  <script>
+    // Função para salvar a nota no cache do navegador
+    function saveNote() {
+      var noteInput = document.getElementById('noteInput');
+      var noteList = document.getElementById('noteList');
+
+      if (noteInput.value.trim() !== '') {
+        var note = document.createElement('li');
+        note.innerText = noteInput.value;
+
+        noteList.appendChild(note);
+        noteInput.value = '';
+
+        // Salvar notas no cache do navegador
+        localStorage.setItem('notes', noteList.innerHTML);
+      }
+    }
+
+    // Função para limpar as notas do cache do navegador
+    function clearNotes() {
+      var noteList = document.getElementById('noteList');
+      noteList.innerHTML = '';
+
+      // Limpar notas do cache do navegador
+      localStorage.removeItem('notes');
+    }
+
+    // Recuperar notas do cache do navegador ao carregar a página
+    window.onload = function() {
+      var noteList = document.getElementById('noteList');
+      var notes = localStorage.getItem('notes');
+
+      if (notes) {
+        noteList.innerHTML = notes;
+      }
+    };
+  </script>
+</body>
+</html>
