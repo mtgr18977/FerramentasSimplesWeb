@@ -17,4 +17,4 @@ As informações são salvas apenas no browser que você estiver usando as ferra
 
 É muito provável (**MESMO**) que tenham vulnerabilidades nessas aplicações, principalmente na parte de JavaScript. Mas reforço que a ideia é rodar apenas localmente essas aplicações.
 
-Se quiser conversar sobre: paulo@paulogpd.net
+Se quiser conversar sobre: paulo@paulogpd.com.br
