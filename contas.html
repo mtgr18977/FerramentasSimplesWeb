@@ -3,52 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-}
-
-h1 {
-    text-align: center;
-}
-
-button {
-    display: block;
-    margin: 10px auto;
-    padding: 10px 20px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border: 1px solid #ccc;
-    margin-bottom: 5px;
-}
-
-.delete {
-    cursor: pointer;
-    color: #e74c3c;
-}
-
-.total-cost {
-    margin-top: 10px;
-    text-align: right;
-    font-weight: bold;
-}
-</style>
+    <link rel="stylesheet" href="styles.css">
 <title>Assinaturas</title>
 </head>
 <body>
@@ -74,10 +29,17 @@ li {
 
         subscriptions.forEach((subscription, index) => {
             const subscriptionItem = document.createElement('li');
-            subscriptionItem.innerHTML = `
-                <span>${subscription.name} - R$ ${subscription.monthlyCost.toFixed(2)}</span>
-                <span class="delete" data-index="${index}">Excluir</span>
-            `;
+            subscriptionItem.classList.add('subscription-item');
+
+            const text = document.createElement('span');
+            text.textContent = `${subscription.name} - R$ ${subscription.monthlyCost.toFixed(2)}`;
+            subscriptionItem.appendChild(text);
+
+            const del = document.createElement('span');
+            del.className = 'delete';
+            del.setAttribute('data-index', index);
+            del.textContent = 'Excluir';
+            subscriptionItem.appendChild(del);
 
             subscriptionList.appendChild(subscriptionItem);
 
@@ -85,7 +47,8 @@ li {
         });
 
         const totalCostElement = document.createElement('p');
-        totalCostElement.innerHTML = `<strong>Total Mensal: R$ ${totalMonthlyCost.toFixed(2)}</strong>`;
+        totalCostElement.className = 'total-cost';
+        totalCostElement.textContent = `Total Mensal: R$ ${totalMonthlyCost.toFixed(2)}`;
         subscriptionList.appendChild(totalCostElement);
 
         const deleteButtons = document.querySelectorAll('.delete');
@@ -103,7 +66,7 @@ li {
         const name = prompt('Digite o nome da assinatura:');
         const monthlyCost = parseFloat(prompt('Digite o valor mensal da assinatura (ex: 9.99):'));
 
-        if (name && monthlyCost) {
+        if (name && !isNaN(monthlyCost)) {
             subscriptions.push({
                 name: name,
                 monthlyCost: monthlyCost
