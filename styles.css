@@ -182,6 +182,9 @@ button:hover {
 }
 
 .note-list li {
+    margin-bottom: 0.5rem;
+    border-bottom: 1px dotted #ccc;
+    padding-bottom: 0.5rem;
    margin-bottom: 0.5rem;
     border-bottom: 1px dotted #ccc;
     padding-bottom: 0.5rem;

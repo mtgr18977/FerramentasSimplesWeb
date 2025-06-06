@@ -8,7 +8,6 @@ As ferramentas são:
 * Um campo de texto que usa a API do Google Tradutor para trazudir uma frase.
 * Um controle de assinaturas simples.
 * Uma aplicação web para tomar notas rapidamente.
-* Uma aplicação web que salva e/ou gera jogos de 6 dezenas para a megasena.
 
 > Nota: todas as aplicações foram feitas com o intuito de rodar localmente, ou seja, você baixa (ou clona) o repositório e abre o arquivo HTML principal (`index.html`) e roda/abre direto no browser.
 > É possível rodar essas aplicação na web utilizando algum serviço de hospedagem (ou edge, como o Netlify ou Vercel).
