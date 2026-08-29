@@ -1,87 +1,149 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
-<title>Assinaturas</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assinaturas – Ferramentas</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Gerenciador de Assinaturas</h1>
-        <button id="addSubscription">Cadastrar Assinatura</button>
-        <ul id="subscriptionList"></ul>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="index.html" class="site-logo">Ferramentas</a>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="page-header">
+      <a href="index.html" class="back-link">Início</a>
+      <h1>Controle de Assinaturas</h1>
     </div>
 
-    <script>
-	document.addEventListener('DOMContentLoaded', function () {
-    const subscriptionList = document.getElementById('subscriptionList');
-    const addSubscriptionButton = document.getElementById('addSubscription');
+    <div class="card">
+      <form id="addForm" class="subscription-form" novalidate>
+        <div class="form-group" style="margin:0">
+          <label for="subName">Nome</label>
+          <input type="text" id="subName" placeholder="Ex: Netflix" maxlength="80" autocomplete="off">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label for="subCost">Valor mensal (R$)</label>
+          <input type="number" id="subCost" placeholder="9.99" step="0.01" min="0.01">
+        </div>
+        <div class="form-group" style="margin:0;display:flex;align-items:flex-end">
+          <button type="submit" class="btn-primary" style="width:100%">Adicionar</button>
+        </div>
+      </form>
+      <div id="formError" class="alert alert-error hidden"></div>
+    </div>
 
-    const subscriptions = JSON.parse(localStorage.getItem('subscriptions')) || [];
+    <ul id="subscriptionList"></ul>
+    <div id="totalCost" class="total-cost hidden"></div>
+  </div>
 
-    function saveSubscriptions() {
-        localStorage.setItem('subscriptions', JSON.stringify(subscriptions));
+  <script>
+    const STORAGE_KEY = 'subscriptions';
+
+    function load() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+      } catch {
+        return [];
+      }
     }
 
-    function updateList() {
-        subscriptionList.innerHTML = '';
-
-        let totalMonthlyCost = 0;
-
-        subscriptions.forEach((subscription, index) => {
-            const subscriptionItem = document.createElement('li');
-            subscriptionItem.classList.add('subscription-item');
-
-            const text = document.createElement('span');
-            text.textContent = `${subscription.name} - R$ ${subscription.monthlyCost.toFixed(2)}`;
-            subscriptionItem.appendChild(text);
-
-            const del = document.createElement('span');
-            del.className = 'delete';
-            del.setAttribute('data-index', index);
-            del.textContent = 'Excluir';
-            subscriptionItem.appendChild(del);
-
-            subscriptionList.appendChild(subscriptionItem);
-
-            totalMonthlyCost += subscription.monthlyCost;
-        });
-
-        const totalCostElement = document.createElement('p');
-        totalCostElement.className = 'total-cost';
-        totalCostElement.textContent = `Total Mensal: R$ ${totalMonthlyCost.toFixed(2)}`;
-        subscriptionList.appendChild(totalCostElement);
-
-        const deleteButtons = document.querySelectorAll('.delete');
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const index = parseInt(this.getAttribute('data-index'));
-                subscriptions.splice(index, 1);
-                saveSubscriptions();
-                updateList();
-            });
-        });
+    function save(subs) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(subs));
     }
 
-    addSubscriptionButton.addEventListener('click', function () {
-        const name = prompt('Digite o nome da assinatura:');
-        const monthlyCost = parseFloat(prompt('Digite o valor mensal da assinatura (ex: 9.99):'));
+    function render() {
+      const subs = load();
+      const list = document.getElementById('subscriptionList');
+      const totalEl = document.getElementById('totalCost');
+      list.innerHTML = '';
 
-        if (name && !isNaN(monthlyCost)) {
-            subscriptions.push({
-                name: name,
-                monthlyCost: monthlyCost
-            });
+      if (subs.length === 0) {
+        totalEl.classList.add('hidden');
+        return;
+      }
 
-            saveSubscriptions();
-            updateList();
-        }
+      let total = 0;
+
+      subs.forEach((sub, i) => {
+        const li = document.createElement('li');
+        li.className = 'subscription-item';
+
+        const info = document.createElement('span');
+        info.className = 'sub-name';
+        info.textContent = sub.name;
+
+        const actions = document.createElement('div');
+        actions.className = 'sub-actions';
+
+        const costSpan = document.createElement('span');
+        costSpan.className = 'sub-cost';
+        costSpan.textContent = `R$ ${sub.monthlyCost.toFixed(2)}`;
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'btn-danger';
+        delBtn.textContent = 'Excluir';
+        delBtn.style.cssText = 'padding:.3rem .7rem;font-size:.8rem';
+        delBtn.addEventListener('click', () => {
+          const current = load();
+          current.splice(i, 1);
+          save(current);
+          render();
+        });
+
+        actions.appendChild(costSpan);
+        actions.appendChild(delBtn);
+        li.appendChild(info);
+        li.appendChild(actions);
+        list.appendChild(li);
+
+        total += sub.monthlyCost;
+      });
+
+      totalEl.textContent = `Total Mensal: R$ ${total.toFixed(2)}`;
+      totalEl.classList.remove('hidden');
+    }
+
+    document.getElementById('addForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const errorEl = document.getElementById('formError');
+      const nameInput = document.getElementById('subName');
+      const costInput = document.getElementById('subCost');
+
+      const name = nameInput.value.trim();
+      const monthlyCost = parseFloat(costInput.value);
+
+      errorEl.classList.add('hidden');
+
+      if (!name) {
+        errorEl.textContent = 'Informe o nome da assinatura.';
+        errorEl.classList.remove('hidden');
+        nameInput.focus();
+        return;
+      }
+
+      if (isNaN(monthlyCost) || monthlyCost <= 0) {
+        errorEl.textContent = 'Informe um valor mensal válido e maior que zero.';
+        errorEl.classList.remove('hidden');
+        costInput.focus();
+        return;
+      }
+
+      const subs = load();
+      subs.push({ name, monthlyCost });
+      save(subs);
+
+      nameInput.value = '';
+      costInput.value = '';
+      nameInput.focus();
+      render();
     });
 
-    updateList();
-});
-
-	</script>
+    render();
+  </script>
 </body>
 </html>

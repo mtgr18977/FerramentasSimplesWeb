@@ -1,37 +1,101 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <title>Tradutor de Texto PT-EN</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tradutor PT → EN – Ferramentas</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="index.html" class="site-logo">Ferramentas</a>
+    </div>
+  </header>
+
   <div class="container">
-    <h1>Tradutor de Texto PT-EN</h1>
-    <textarea id="inputTextarea" placeholder="Cole o texto em português aqui"></textarea>
-    <button id="translateBtn">Traduzir</button>
-    <textarea id="outputTextarea" placeholder="Texto traduzido em inglês aparecerá aqui" readonly></textarea>
+    <div class="page-header">
+      <a href="index.html" class="back-link">Início</a>
+      <h1>Tradutor PT → EN</h1>
+    </div>
+
+    <div class="card">
+      <div class="translator-grid">
+        <div class="form-group" style="margin:0">
+          <label for="inputTextarea">Português</label>
+          <textarea id="inputTextarea" placeholder="Cole o texto em português aqui..."></textarea>
+        </div>
+        <div class="translator-arrow">→</div>
+        <div class="form-group" style="margin:0">
+          <label for="outputTextarea">English</label>
+          <textarea id="outputTextarea" placeholder="Translated text will appear here..." readonly></textarea>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="translateBtn" class="btn-primary">Traduzir</button>
+      </div>
+
+      <div id="statusMsg" class="hidden"></div>
+    </div>
   </div>
 
   <script>
-    document.getElementById('translateBtn').addEventListener('click', () => {
-      const inputText = document.getElementById('inputTextarea').value;
+    const translateBtn = document.getElementById('translateBtn');
+    const statusMsg = document.getElementById('statusMsg');
+
+    function setStatus(message, type) {
+      statusMsg.textContent = message;
+      statusMsg.className = `alert alert-${type}`;
+    }
+
+    function clearStatus() {
+      statusMsg.className = 'hidden';
+      statusMsg.textContent = '';
+    }
+
+    translateBtn.addEventListener('click', async () => {
+      const inputText = document.getElementById('inputTextarea').value.trim();
+      const outputTextarea = document.getElementById('outputTextarea');
+
+      clearStatus();
 
       if (!inputText) {
-        alert('Por favor, insira um texto em português para traduzir.');
+        setStatus('Por favor, insira algum texto em português para traduzir.', 'error');
         return;
       }
 
-      const googleTranslateUrl = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=pt&tl=en&dt=t&q=';
+      translateBtn.disabled = true;
+      translateBtn.innerHTML = '<span class="spinner"></span> Traduzindo…';
+      outputTextarea.value = '';
 
-      fetch(googleTranslateUrl + encodeURIComponent(inputText))
-        .then(response => response.json())
-        .then(data => {
-          const translatedText = data[0][0][0];
-          document.getElementById('outputTextarea').value = translatedText;
-        })
-        .catch(error => {
-          console.error('Erro na tradução:', error);
-        });
+      try {
+        const url = 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=pt&tl=en&dt=t&q='
+          + encodeURIComponent(inputText);
+
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        const translated = Array.isArray(data[0])
+          ? data[0].map(seg => (Array.isArray(seg) && typeof seg[0] === 'string') ? seg[0] : '').join('')
+          : '';
+
+        if (!translated) {
+          throw new Error('Resposta inesperada da API.');
+        }
+
+        outputTextarea.value = translated;
+      } catch {
+        setStatus('Erro na tradução. Verifique sua conexão e tente novamente.', 'error');
+      } finally {
+        translateBtn.disabled = false;
+        translateBtn.innerHTML = 'Traduzir';
+      }
     });
   </script>
 </body>
