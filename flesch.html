@@ -1,63 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <title>WebApp Índice de Legibilidade Flesch</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Índice de Legibilidade Flesch – Ferramentas</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="index.html" class="site-logo">Ferramentas</a>
+    </div>
+  </header>
+
   <div class="container">
-    <h1>WebApp Índice de Legibilidade Flesch</h1>
-    <textarea id="inputTextarea" placeholder="Cole o texto aqui"></textarea>
-    <button id="calculateBtn">Calcular</button>
-    <table>
-      <tr>
-        <th>Número de Palavras</th>
-        <th>Número de Frases</th>
-        <th>Número de Sílabas</th>
-        <th>Índice de Legibilidade Flesch</th>
-      </tr>
-      <tr>
-        <td id="numPalavras"></td>
-        <td id="numFrases"></td>
-        <td id="numSilabas"></td>
-        <td id="fleschIndex"></td>
-      </tr>
-    </table>
+    <div class="page-header">
+      <a href="index.html" class="back-link">Início</a>
+      <h1>Índice Flesch</h1>
+    </div>
+
+    <div class="card">
+      <div class="form-group">
+        <label for="inputTextarea">Cole ou escreva o texto para análise</label>
+        <textarea id="inputTextarea" placeholder="Insira o texto que deseja analisar..."></textarea>
+      </div>
+      <div class="button-row">
+        <button id="calculateBtn" class="btn-primary">Calcular</button>
+      </div>
+    </div>
+
+    <div id="errorMsg" class="alert alert-error hidden"></div>
+
+    <div id="results" class="hidden">
+      <div class="flesch-score">
+        <div class="score-value" id="fleschIndex">–</div>
+        <div class="score-label">Índice de Legibilidade Flesch</div>
+        <div class="score-interp" id="scoreInterp"></div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Palavras</th>
+            <th>Frases</th>
+            <th>Sílabas</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="numPalavras">–</td>
+            <td id="numFrases">–</td>
+            <td id="numSilabas">–</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-<script>
-    // Função para calcular o Índice de Legibilidade Flesch
+
+  <script>
     function calcularFlesch(texto) {
-      // Remover pontuações e quebras de linha para contar corretamente as palavras e frases
-      const cleanText = texto.replace(/[\.,?!;:'"()\n]/g, '');
-
-      // Contar o número de palavras
-      const palavras = cleanText.trim().split(/\s+/).length;
-
-      // Contar o número de frases
-      const frases = cleanText.split(/[.!?]/g).filter(Boolean).length;
-
-      // Contar o número de sílabas (uma aproximação simples)
-      const silabas = cleanText.split(/[aeiouyáàâãéèêíìîóòôõúùû]/i).length - 1;
-
-      // Calcular o Índice de Legibilidade Flesch
+      const cleanText = texto.replace(/[.,?!;:'"()\n]/g, ' ').replace(/\s+/g, ' ').trim();
+      const palavras = cleanText.split(/\s+/).filter(Boolean).length;
+      const frases = texto.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+      const silabas = (texto.match(/[aeiouyáàâãéèêíìîóòôõúùûü]/gi) || []).length;
       const flesch = 206.835 - 1.015 * (palavras / frases) - 84.6 * (silabas / palavras);
-
-      return { palavras, frases, silabas, flesch }; // Retornar um objeto com os valores calculados
+      return { palavras, frases, silabas, flesch };
     }
 
-    // Evento ao clicar no botão "Calcular"
+    function interpretScore(score) {
+      if (score >= 90) return 'Muito Fácil';
+      if (score >= 80) return 'Fácil';
+      if (score >= 70) return 'Razoavelmente Fácil';
+      if (score >= 60) return 'Padrão';
+      if (score >= 50) return 'Razoavelmente Difícil';
+      if (score >= 30) return 'Difícil';
+      return 'Muito Difícil';
+    }
+
     document.getElementById('calculateBtn').addEventListener('click', () => {
-      const inputText = document.getElementById('inputTextarea').value;
+      const inputText = document.getElementById('inputTextarea').value.trim();
+      const errorMsg = document.getElementById('errorMsg');
+      const results = document.getElementById('results');
+
+      errorMsg.classList.add('hidden');
+      results.classList.add('hidden');
+
+      if (!inputText) {
+        errorMsg.textContent = 'Por favor, insira algum texto antes de calcular.';
+        errorMsg.classList.remove('hidden');
+        return;
+      }
+
       const { palavras, frases, silabas, flesch } = calcularFlesch(inputText);
+
+      if (!isFinite(flesch) || isNaN(flesch)) {
+        errorMsg.textContent = 'Não foi possível calcular. O texto precisa ter pelo menos uma frase e uma palavra.';
+        errorMsg.classList.remove('hidden');
+        return;
+      }
 
       document.getElementById('numPalavras').textContent = palavras;
       document.getElementById('numFrases').textContent = frases;
       document.getElementById('numSilabas').textContent = silabas;
-      document.getElementById('fleschIndex').textContent = isNaN(flesch) ? 'N/A' : flesch.toFixed(2);
-
-      // Exibir o resultado na página HTML
-      const resultadoElement = document.getElementById('resultado');
-      resultadoElement.textContent = isNaN(flesch) ? 'N/A' : `O Índice de Legibilidade Flesch é: ${flesch.toFixed(2)}`;
+      document.getElementById('fleschIndex').textContent = flesch.toFixed(1);
+      document.getElementById('scoreInterp').textContent = interpretScore(flesch);
+      results.classList.remove('hidden');
     });
   </script>
 </body>

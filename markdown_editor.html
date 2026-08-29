@@ -1,68 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor Markdown – Ferramentas</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container editor-container">
-        <div class="title"><h2>Editor</h2></div>
-        <textarea class="editor" id="editor" oninput="updatePreview()"></textarea>
-        <div class="title"><h2>Visualização</h2></div>
-        <div class="preview" id="preview"></div>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <a href="index.html" class="site-logo">Ferramentas</a>
     </div>
-    <div class="container">
-        <div class="button-container">
-            <button class="action-button" onclick="clearEditor()">Limpar</button>
-            <button class="action-button" onclick="saveEditor()">Salvar</button>
-            <input class="file-input" type="file" accept=".md" onchange="loadFile(event)">
-            <button class="action-button" onclick="document.querySelector('.file-input').click()">Carregar Arquivo</button>
-        </div>
+  </header>
+
+  <div class="container">
+    <div class="page-header">
+      <a href="index.html" class="back-link">Início</a>
+      <h1>Editor Markdown</h1>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/marked@1.2.9/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.10/dist/purify.min.js"></script>
-    <script>
-    var editor = document.getElementById('editor');
-    var preview = document.getElementById('preview');
+    <div class="editor-wrapper">
+      <div class="editor-pane">
+        <h2>Editor</h2>
+        <textarea class="editor" id="editor" spellcheck="false" placeholder="# Olá!&#10;&#10;Comece a escrever em Markdown..."></textarea>
+      </div>
+      <div class="editor-pane">
+        <h2>Prévia</h2>
+        <div class="preview" id="preview"></div>
+      </div>
+    </div>
+
+    <div class="button-row mt-2">
+      <button onclick="clearEditor()" class="btn-ghost">Limpar</button>
+      <button onclick="saveEditor()">Salvar .md</button>
+      <input class="file-input" type="file" accept=".md,.txt" id="fileInput" onchange="loadFile(event)">
+      <button onclick="document.getElementById('fileInput').click()" class="btn-ghost">Carregar arquivo</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <script>
+    const editor = document.getElementById('editor');
+    const preview = document.getElementById('preview');
+
+    marked.setOptions({ breaks: true, gfm: true });
 
     function updatePreview() {
-        var markdown = editor.value;
-        preview.innerHTML = DOMPurify.sanitize(marked(markdown));
+      preview.innerHTML = DOMPurify.sanitize(marked.parse(editor.value));
     }
 
-    function clearEditor() {
-        editor.value = '';
-        preview.innerHTML = '';
-    }
+    editor.addEventListener('input', updatePreview);
 
     editor.addEventListener('scroll', function () {
-        var scale = this.scrollHeight - this.clientHeight;
-        var scrollPercent = this.scrollTop / scale;
-        var previewScale = preview.scrollHeight - preview.clientHeight;
-        preview.scrollTop = scrollPercent * previewScale;
+      const scale = this.scrollHeight - this.clientHeight;
+      if (scale <= 0) return;
+      const pct = this.scrollTop / scale;
+      const previewScale = preview.scrollHeight - preview.clientHeight;
+      preview.scrollTop = pct * previewScale;
     });
 
+    function clearEditor() {
+      if (editor.value && !confirm('Descartar o conteúdo atual?')) return;
+      editor.value = '';
+      preview.innerHTML = '';
+    }
+
     function saveEditor() {
-        var markdown = editor.value;
-        var blob = new Blob([markdown], {type: "text/plain;charset=utf-8"});
-        var url = URL.createObjectURL(blob);
-        var link = document.createElement('a');
-        link.download = "doc.md";
-        link.href = url;
-        link.click();
+      const blob = new Blob([editor.value], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.download = 'documento.md';
+      a.href = url;
+      a.click();
+      URL.revokeObjectURL(url);
     }
 
     function loadFile(event) {
-        var file = event.target.files[0];
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var content = e.target.result;
-            editor.value = content;
-            updatePreview();
-        };
-        reader.readAsText(file);
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        editor.value = e.target.result;
+        updatePreview();
+      };
+      reader.readAsText(file);
+      event.target.value = '';
     }
-    </script>
+  </script>
 </body>
 </html>

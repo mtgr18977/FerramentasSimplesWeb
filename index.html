@@ -1,22 +1,52 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ferramentas</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Ferramentas</h1>
+  <header class="site-header">
+    <div class="site-header-inner">
+      <span class="site-logo">Ferramentas</span>
+      <a href="https://github.com/mtgr18977" class="back-link" style="text-decoration:none;color:var(--text-muted)">GitHub</a>
+    </div>
+  </header>
 
-    <!-- Links para as ferramentas -->
-    <a class="tool-link" href="flesch.html">WebApp Índice de Legibilidade Flesch</a>
-    <a class="tool-link" href="markdown_editor.html">Editor de Markdown</a>
-    <a class="tool-link" href="notas.html">Notas</a>
-	  <a class="tool-link" href="trad_paulo.html">Tradutor</a>
-    <a class="tool-link" href="contas.html">Controle de assinaturas</a>
-    <br>
-    <br>
-    <a class="tool-link" href="https://github.com/mtgr18977">GitHub</a>
+  <div class="container">
+    <div class="hero">
+      <h1>Ferramentas</h1>
+      <p>Um conjunto de utilitários simples para o dia a dia.</p>
+    </div>
+
+    <div class="tools-grid">
+      <a class="tool-card" href="flesch.html">
+        <span class="tool-icon">📖</span>
+        <span class="tool-name">Índice Flesch</span>
+        <span class="tool-desc">Analisa a legibilidade de um texto usando a fórmula de Flesch.</span>
+      </a>
+      <a class="tool-card" href="markdown_editor.html">
+        <span class="tool-icon">✏️</span>
+        <span class="tool-name">Editor Markdown</span>
+        <span class="tool-desc">Editor com prévia em tempo real. Salve e carregue arquivos .md.</span>
+      </a>
+      <a class="tool-card" href="notas.html">
+        <span class="tool-icon">📝</span>
+        <span class="tool-name">Notas</span>
+        <span class="tool-desc">Anotações rápidas salvas localmente no navegador.</span>
+      </a>
+      <a class="tool-card" href="trad_paulo.html">
+        <span class="tool-icon">🌐</span>
+        <span class="tool-name">Tradutor PT → EN</span>
+        <span class="tool-desc">Traduz texto do português para o inglês.</span>
+      </a>
+      <a class="tool-card" href="contas.html">
+        <span class="tool-icon">💳</span>
+        <span class="tool-name">Assinaturas</span>
+        <span class="tool-desc">Controle seus gastos mensais com assinaturas e serviços.</span>
+      </a>
+    </div>
   </div>
 </body>
 </html>
